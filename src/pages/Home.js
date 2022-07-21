@@ -1,11 +1,11 @@
 import React from 'react';
-import Announcement from '../componenets/Announcement';
-import Categories from '../componenets/Categories';
-import Footer from '../componenets/Footer';
-import Navbar from '../componenets/Navbar';
-import Newsletter from '../componenets/NewsLetter';
-import Products from '../componenets/Products';
-import Slider from '../componenets/Slider';
+import Announcement from '../components/Announcement';
+import Categories from '../components/Categories';
+import Footer from '../components/Footer';
+import Navbar from '../components/Navbar';
+import Newsletter from '../components/NewsLetter';
+import Products from '../components/Products';
+import Slider from '../components/Slider';
 
 export default function Home() {
   return (
