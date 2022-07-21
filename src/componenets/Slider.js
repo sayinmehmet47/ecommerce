@@ -1,13 +1,16 @@
 import { ArrowLeftOutlined, ArrowRightOutlined } from '@material-ui/icons';
-import { sliderItems } from '../data';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
+import { sliderItems } from '../data';
+import { mobile } from '../responsive';
 
 const Container = styled.div`
+  width: 100%;
   height: 100vh;
-  width: 100vw;
   display: flex;
+  position: relative;
   overflow: hidden;
+  ${mobile({ display: 'none' })}
 `;
 
 const Arrow = styled.div`
@@ -28,6 +31,14 @@ const Arrow = styled.div`
   opacity: 0.5;
   z-index: 2;
 `;
+
+const Wrapper = styled.div`
+  height: 100%;
+  display: flex;
+  transition: all 1.5s ease;
+  transform: translateX(${(props) => props.slideIndex * -100}vw);
+`;
+
 const Slide = styled.div`
   width: 100vw;
   height: 100vh;
@@ -36,12 +47,6 @@ const Slide = styled.div`
   background-color: #${(props) => props.bg};
 `;
 
-const Wrapper = styled.div`
-  height: 100%;
-  display: flex;
-  transition: all 1.5s ease;
-  transform: translateX(${(props) => props.slideIndex * -100}vw);
-`;
 const ImgContainer = styled.div`
   height: 100%;
   flex: 1;
@@ -55,6 +60,7 @@ const InfoContainer = styled.div`
   flex: 1;
   padding: 50px;
 `;
+
 const Title = styled.h1`
   font-size: 70px;
 `;
@@ -73,7 +79,7 @@ const Button = styled.button`
   cursor: pointer;
 `;
 
-export default function Slider() {
+const Slider = () => {
   const [slideIndex, setSlideIndex] = useState(0);
   const handleClick = (direction) => {
     if (direction === 'left') {
@@ -82,11 +88,12 @@ export default function Slider() {
       setSlideIndex(slideIndex < 2 ? slideIndex + 1 : 0);
     }
   };
+
   return (
     <Container>
       <Arrow direction="left" onClick={() => handleClick('left')}>
         <ArrowLeftOutlined />
-      </Arrow>{' '}
+      </Arrow>
       <Wrapper slideIndex={slideIndex}>
         {sliderItems.map((item) => (
           <Slide bg={item.bg} key={item.id}>
@@ -106,4 +113,6 @@ export default function Slider() {
       </Arrow>
     </Container>
   );
-}
+};
+
+export default Slider;
