@@ -66,7 +66,7 @@ const registerUser = async (req, res) => {
     const token = jwt.sign(
       { id: savedUser._id, isAdmin: savedUser.isAdmin },
       process.env.JWT_SECRET,
-      { expiresIn: '1h' }
+      { expiresIn: '4h' }
     );
     res.status(200).json({
       token,
@@ -86,21 +86,12 @@ const updateUser = async (req, res) => {
     const updateUser = await User.findByIdAndUpdate(
       req.params.id,
       {
-        $set: {
-          username: req.body.username,
-        },
+        $set: req.body,
       },
       { new: true }
     );
     if (!updateUser) throw Error('User not found');
-    res.status(200).json({
-      msg: 'User updated',
-      user: {
-        id: updateUser.id,
-        username: updateUser.username,
-        email: updateUser.email,
-      },
-    });
+    res.status(200).json(updateUser);
   } catch (e) {
     res.status(400).json({ msg: e.message });
   }
@@ -138,4 +129,76 @@ const getUser = async (req, res) => {
   }
 };
 
-module.exports = { loginUser, registerUser, updateUser, deleteUser, getUser };
+//GET ALL USERS
+
+const getAllUsers = async (req, res) => {
+  const query = req.query.new;
+  try {
+    const users = query
+      ? await User.find().sort({ createdAt: -1 }).limit(5)
+      : await User.find();
+
+    if (!users) throw Error('No users found');
+    res.status(200).json({
+      users: users.map((user) => ({
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      })),
+    });
+  } catch (error) {
+    res.status(400).json({
+      error: error.message,
+    });
+  }
+};
+
+// GET USERS STATS
+
+const getUsersStats = async (req, res) => {
+  const date = new Date();
+  const lastYear = new Date(date.setFullYear(date.getFullYear() - 1));
+
+  try {
+    const data = await User.aggregate([
+      {
+        $match: {
+          createdAt: {
+            $gte: lastYear,
+          },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            $month: '$createdAt',
+          },
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $sort: {
+          _id: 1,
+        },
+      },
+    ]);
+    if (!data) throw Error('No users found');
+    res.status(200).json(data);
+  } catch (error) {
+    res.status(400).json({
+      error: error.message,
+    });
+  }
+};
+
+module.exports = {
+  loginUser,
+  registerUser,
+  updateUser,
+  deleteUser,
+  getUser,
+  getAllUsers,
+  getUsersStats,
+};

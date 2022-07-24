@@ -1,6 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const userRoute = require('./routes/userRoute');
+const productRoute = require('./routes/productRoute');
+const cardRoute = require('./routes/cartRoute');
 require('dotenv').config();
 
 const app = express();
@@ -14,6 +16,8 @@ app.use((req, res, next) => {
 });
 
 app.use('/api/user', userRoute);
+app.use('/api/products', productRoute);
+app.use('/api/cards', cardRoute);
 
 mongoose
   .connect(process.env.MONGO_URI, { useNewUrlParser: true })
