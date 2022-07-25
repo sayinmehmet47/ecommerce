@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import StripeCheckout from 'react-stripe-checkout';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 export const Center = styled.div`
   height: 100vh;
@@ -30,6 +31,7 @@ export default function Pay() {
   const STRIPE_KEY =
     'pk_test_51LP6aiGCJMINMCUu3IORbXLsC0BdY227snNxLUSOcnAGk7PKfvNj9GdEkrddwqFoUc7e7VzmIaLuL1NTX6bz83hn00uJ2Lz06v';
   const [stripeToken, setStripeToken] = useState(null);
+  const navigate = useNavigate();
 
   const onToken = (token) => {
     setStripeToken(token);
@@ -43,6 +45,7 @@ export default function Pay() {
           amount: 2000,
         });
         console.log(res.data);
+        navigate('/success');
       };
       stripeToken && makeRequest();
     } catch (error) {
@@ -51,18 +54,18 @@ export default function Pay() {
   }, [stripeToken]);
 
   return (
-    <StripeCheckout
-      description="Your total amount is $20" // the pop-in header subtitle
-      billingAddress
-      shippingAddress
-      name="Mehmet shop"
-      amount={2000}
-      token={onToken}
-      stripeKey={STRIPE_KEY}
-    >
-      <Center>
+    <Center>
+      <StripeCheckout
+        description="Your total amount is $20" // the pop-in header subtitle
+        billingAddress
+        shippingAddress
+        name="Mehmet shop"
+        amount={2000}
+        token={onToken}
+        stripeKey={STRIPE_KEY}
+      >
         <Button>Pay</Button>
-      </Center>
-    </StripeCheckout>
+      </StripeCheckout>
+    </Center>
   );
 }
