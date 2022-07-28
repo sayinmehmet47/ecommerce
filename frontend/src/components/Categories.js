@@ -1,4 +1,5 @@
 import React from 'react';
+import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
 import { categories } from '../data';
 import { mobile } from '../responsive';
@@ -14,8 +15,10 @@ const Container = styled.div`
 export default function Categories() {
   return (
     <Container>
-      {categories.map((item) => (
-        <CategoryItem item={item} key={item.id} />
+      {categories.map((item, index) => (
+        <NavLink key={index} to={`/products/${item.category}`}>
+          <CategoryItem item={item} key={item.id} />
+        </NavLink>
       ))}
     </Container>
   );
