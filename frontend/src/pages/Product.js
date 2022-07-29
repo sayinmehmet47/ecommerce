@@ -1,5 +1,8 @@
 import { Add, Remove } from '@material-ui/icons';
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
+import { publicRequest } from '../axios';
 import Announcement from '../components/Announcement';
 import Footer from '../components/Footer';
 import Navbar from '../components/Navbar';
@@ -21,8 +24,8 @@ const ImgContainer = styled.div`
 const Image = styled.img`
   width: 100%;
   height: 90vh;
-  object-fit: cover;
-  ${mobile({ height: '40vh' })}
+  object-fit: contain;
+  ${mobile({ height: '40vh' })};
 `;
 
 const InfoContainer = styled.div`
@@ -115,13 +118,28 @@ const Button = styled.button`
 `;
 
 const Product = () => {
+  const { id } = useParams();
+  const [product, setProduct] = useState({});
+
+  useEffect(() => {
+    const getProduct = async () => {
+      try {
+        const response = await publicRequest(`/products/${id}`);
+        setProduct(response.data);
+      } catch (error) {}
+    };
+    getProduct();
+  }, [id]);
+
+  console.log(product);
+
   return (
     <Container>
       <Navbar />
       <Announcement />
       <Wrapper>
         <ImgContainer>
-          <Image src="https://i.ibb.co/S6qMxwr/jean.jpg" />
+          <Image src={product.img} />
         </ImgContainer>
         <InfoContainer>
           <Title>Denim Jumpsuit</Title>
