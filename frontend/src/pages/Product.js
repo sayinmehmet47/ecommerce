@@ -7,7 +7,9 @@ import Announcement from '../components/Announcement';
 import Footer from '../components/Footer';
 import Navbar from '../components/Navbar';
 import Newsletter from '../components/NewsLetter';
+import { useDispatch } from 'react-redux';
 import { mobile } from '../responsive';
+import { addProduct } from '../redux/cartRedux';
 
 const Container = styled.div``;
 
@@ -68,6 +70,7 @@ const FilterTitle = styled.span`
 const FilterColor = styled.div`
   width: 20px;
   height: 20px;
+  border: 1px solid black;
   border-radius: 50%;
   background-color: ${(props) => props.color};
   margin: 0px 5px;
@@ -120,6 +123,10 @@ const Button = styled.button`
 const Product = () => {
   const { id } = useParams();
   const [product, setProduct] = useState({});
+  const [quantity, setQuantity] = useState(1);
+  const [size, setSize] = useState('');
+  const [colors, setColor] = useState('');
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const getProduct = async () => {
@@ -131,7 +138,9 @@ const Product = () => {
     getProduct();
   }, [id]);
 
-  console.log(product);
+  const handleClick = () => {
+    dispatch(addProduct({ ...product, quantity, colors, size }));
+  };
 
   return (
     <Container>
@@ -142,40 +151,40 @@ const Product = () => {
           <Image src={product.img} />
         </ImgContainer>
         <InfoContainer>
-          <Title>Denim Jumpsuit</Title>
-          <Desc>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec
-            venenatis, dolor in finibus malesuada, lectus ipsum porta nunc, at
-            iaculis arcu nisi sed mauris. Nulla fermentum vestibulum ex, eget
-            tristique tortor pretium ut. Curabitur elit justo, consequat id
-            condimentum ac, volutpat ornare.
-          </Desc>
-          <Price>$ 20</Price>
+          <Title>{product.title}</Title>
+          <Desc>{product.desc}</Desc>
+          <Price>$ {product.price}</Price>
           <FilterContainer>
             <Filter>
-              <FilterTitle>Color</FilterTitle>
-              <FilterColor color="black" />
-              <FilterColor color="darkblue" />
-              <FilterColor color="gray" />
+              <FilterTitle>Color</FilterTitle>{' '}
+              {product?.colors?.map((color) => {
+                return (
+                  <FilterColor
+                    onClick={() => setColor(color)}
+                    color={color}
+                    key={color}
+                  />
+                );
+              })}
             </Filter>
             <Filter>
               <FilterTitle>Size</FilterTitle>
-              <FilterSize>
-                <FilterSizeOption>XS</FilterSizeOption>
-                <FilterSizeOption>S</FilterSizeOption>
-                <FilterSizeOption>M</FilterSizeOption>
-                <FilterSizeOption>L</FilterSizeOption>
-                <FilterSizeOption>XL</FilterSizeOption>
+              <FilterSize onChange={(e) => setSize(e.target.value)}>
+                {product.size?.map((s) => (
+                  <FilterSizeOption key={s}>{s}</FilterSizeOption>
+                ))}
               </FilterSize>
             </Filter>
           </FilterContainer>
           <AddContainer>
             <AmountContainer>
-              <Remove />
-              <Amount>1</Amount>
-              <Add />
+              <Remove
+                onClick={() => setQuantity((prev) => (prev > 1 ? prev - 1 : 1))}
+              />
+              <Amount>{quantity}</Amount>
+              <Add onClick={() => setQuantity((prev) => prev + 1)} />
             </AmountContainer>
-            <Button>ADD TO CART</Button>
+            <Button onClick={handleClick}>ADD TO CART</Button>
           </AddContainer>
         </InfoContainer>
       </Wrapper>
