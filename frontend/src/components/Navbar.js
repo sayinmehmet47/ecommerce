@@ -5,6 +5,8 @@ import styled from 'styled-components';
 import { useSelector } from 'react-redux';
 import { mobile } from '../responsive';
 import { NavLink } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { logoutThunk } from '../redux/userRedux';
 
 const Container = styled.div`
   height: 60px;
@@ -72,6 +74,7 @@ const Right = styled.div`
 
 const MenuItem = styled.div`
   font-size: 14px;
+  color: ${(props) => (props.active ? 'red' : 'black')};
   cursor: pointer;
   margin-left: 25px;
   ${mobile({ fontSize: '12px', marginLeft: '10px' })}
@@ -79,6 +82,11 @@ const MenuItem = styled.div`
 
 export default function Navbar() {
   const quantity = useSelector((state) => state.cart.quantity);
+  const isLoggedIn = useSelector((state) => state.authSlice.isLoggedIn);
+  const userName = useSelector((state) => state.authSlice.user.user?.username);
+
+  const dispatch = useDispatch();
+
   return (
     <Container>
       <Wrapper>
@@ -97,8 +105,25 @@ export default function Navbar() {
           </Logo>
         </Center>
         <Right>
-          <MenuItem>Register</MenuItem>
-          <MenuItem>Login</MenuItem>
+          {isLoggedIn ? (
+            <Wrapper>
+              <MenuItem active>{userName}</MenuItem>
+              <MenuItem onClick={() => dispatch(logoutThunk())}>
+                Logout
+              </MenuItem>
+            </Wrapper>
+          ) : (
+            <Wrapper>
+              <NavLink to="/register">
+                <MenuItem>Register</MenuItem>
+              </NavLink>
+
+              <NavLink to="/login">
+                <MenuItem>Login</MenuItem>
+              </NavLink>
+            </Wrapper>
+          )}
+
           <MenuItem>
             {' '}
             <NavLink to="/card">

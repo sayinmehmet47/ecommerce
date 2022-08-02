@@ -1,11 +1,18 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Announcement from '../components/Announcement';
 import Navbar from '../components/Navbar';
 import { useSelector } from 'react-redux';
 import { Add, Remove } from '@material-ui/icons';
+import StripeCheckout from 'react-stripe-checkout';
 
 import { mobile } from '../responsive';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { userRequest } from '../axios';
+
+const KEY =
+  'pk_test_51LP6aiGCJMINMCUu3IORbXLsC0BdY227snNxLUSOcnAGk7PKfvNj9GdEkrddwqFoUc7e7VzmIaLuL1NTX6bz83hn00uJ2Lz06v';
 
 const Wrapper = styled.div`
   padding: 20px;
@@ -150,7 +157,29 @@ const Button = styled.button`
 `;
 
 export default function Card() {
+  const [stripeToken, setStripeToken] = useState(null);
   const cart = useSelector((state) => state.cart);
+  const navigate = useNavigate();
+
+  const onToken = (token) => {
+    setStripeToken(token);
+  };
+
+  useEffect(() => {
+    try {
+      const makeRequest = async () => {
+        const res = axios.post('http://localhost:4000/api/payment', {
+          tokenId: stripeToken.id,
+          amount: cart.total * 100,
+        });
+        navigate('/success');
+      };
+      stripeToken && makeRequest();
+    } catch (error) {
+      console.log(error);
+    }
+  }, [stripeToken]);
+
   return (
     <div>
       <Navbar />
@@ -168,7 +197,7 @@ export default function Card() {
         <Bottom>
           <Info>
             {cart?.products?.map((product) => (
-              <Product>
+              <Product key={product.id}>
                 <ProductDetail>
                   <Image src={product.img} />
                   <Details>
@@ -216,7 +245,7 @@ export default function Card() {
               <SummaryItemText>Total</SummaryItemText>
               <SummaryItemPrice>$ {cart.total}</SummaryItemPrice>
             </SummaryItem>
-            {/* <StripeCheckout
+            <StripeCheckout
               name="Lama Shop"
               image="https://avatars.githubusercontent.com/u/1486366?v=4"
               billingAddress
@@ -227,7 +256,7 @@ export default function Card() {
               stripeKey={KEY}
             >
               <Button>CHECKOUT NOW</Button>
-            </StripeCheckout>  */}
+            </StripeCheckout>
           </Summary>
         </Bottom>
       </Wrapper>

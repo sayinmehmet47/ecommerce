@@ -1,5 +1,9 @@
 import styled from 'styled-components';
 import { mobile } from '../responsive';
+import { useDispatch } from 'react-redux';
+import { registerThunk } from '../redux/userRedux';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 const Container = styled.div`
   width: 100vw;
@@ -55,22 +59,49 @@ const Button = styled.button`
 `;
 
 const Register = () => {
+  const dispatch = useDispatch();
+  const isLoggedIn = useSelector((state) => state.authSlice.isLoggedIn);
+  const navigate = useNavigate();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const data = new FormData(e.target);
+    const { username, password, email, passwordRepeat } = Object.fromEntries(
+      data.entries()
+    );
+    if (passwordRepeat === password) {
+      dispatch(registerThunk({ username, password, email })).then(() => {
+        navigate('/');
+      });
+    } else {
+      alert('Passwords do not match');
+    }
+  };
+
   return (
     <Container>
       <Wrapper>
         <Title>CREATE AN ACCOUNT</Title>
-        <Form>
-          <Input placeholder="name" />
-          <Input placeholder="last name" />
-          <Input placeholder="username" />
-          <Input placeholder="email" />
-          <Input placeholder="password" />
-          <Input placeholder="confirm password" />
+        <Form onSubmit={handleSubmit}>
+          <Input name="username" placeholder="username" type="name" required />
+          <Input name="email" placeholder="email" type="email" required />
+          <Input
+            name="password"
+            placeholder="password"
+            type="password"
+            required
+          />
+          <Input
+            required
+            name="passwordRepeat"
+            placeholder="confirm password"
+            type="password"
+          />
           <Agreement>
             By creating an account, I consent to the processing of my personal
             data in accordance with the <b>PRIVACY POLICY</b>
           </Agreement>
-          <Button>CREATE</Button>
+          <Button type="submit">CREATE</Button>
         </Form>
       </Wrapper>
     </Container>
