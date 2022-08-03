@@ -67,12 +67,20 @@ const Login = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const data = new FormData(e.target);
-
     const { username, password } = Object.fromEntries(data.entries());
 
-    dispatch(loginThunk({ username, password })).then(() => {
-      navigate('/');
-    });
+    dispatch(loginThunk({ username, password })).then(
+      (res) => {
+        if (res.payload.status === 200) {
+          navigate('/');
+        } else {
+          console.log(res.payload.response.data.error);
+        }
+      },
+      (err) => {
+        console.log(err);
+      }
+    );
   };
 
   return (

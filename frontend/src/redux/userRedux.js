@@ -16,7 +16,7 @@ export const loginThunk = createAsyncThunk(
         localStorage.setItem('jwtToken', token);
         setAuthorizationToken(token);
       }
-      return res.data;
+      return res;
     } catch (err) {
       return rejectWithValue(err);
     }
@@ -54,7 +54,7 @@ export const registerThunk = createAsyncThunk(
         localStorage.setItem('jwtToken', token);
         setAuthorizationToken(token);
       }
-      return res.data;
+      return res;
     } catch (err) {
       return rejectWithValue(err);
     }
@@ -86,7 +86,7 @@ export const authSlice = createSlice({
       })
       .addCase(loginThunk.fulfilled, (state, action) => {
         state.isLoggedIn = true;
-        state.user = action.payload;
+        state.user = action.payload.data;
       })
       .addCase(loginThunk.rejected, (state, action) => {
         state.error = true;
@@ -110,7 +110,7 @@ export const authSlice = createSlice({
       })
       .addCase(registerThunk.fulfilled, (state, action) => {
         state.isLoggedIn = true;
-        state.user = action.payload;
+        state.user = action.payload.data;
       })
       .addCase(registerThunk.rejected, (state, action) => {
         state.error = true;
