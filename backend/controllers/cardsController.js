@@ -1,4 +1,5 @@
 const Card = require('../models/Card');
+const User = require('../models/User');
 
 const createCard = async (req, res) => {
   const newCard = new Card(req.body);
@@ -47,7 +48,15 @@ const deleteCard = async (req, res) => {
 
 const getCard = async (req, res) => {
   try {
-    const cart = await Card.findOne({ userId: req.params.userId });
+    const cart = await Card.findOne({ userId: req.params.userId })
+      .populate({
+        path: 'userId',
+        model: 'User',
+      })
+      .populate({
+        path: 'products.productId',
+        model: 'Product',
+      });
     if (!cart) throw Error('Card not found');
     res.status(200).json(cart);
   } catch (error) {
